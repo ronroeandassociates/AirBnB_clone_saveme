@@ -26,9 +26,7 @@ def get_amenities(amenity_id):
         get_amenity = check_id(Amenity, amenity_id).to_dict()
         return jsonify(get_amenity)
     all_amenities = storage.all(Amenity)
-    amenities = []
-    for v in all_amenities.values():
-        amenities.append(v.to_dict())
+    amenities = [v.to_dict() for v in all_amenities.values()]
     return jsonify(amenities)
 
 
