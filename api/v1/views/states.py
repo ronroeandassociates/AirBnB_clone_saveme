@@ -27,9 +27,7 @@ def get_all(id_state):
         dict_state = state.to_dict()
         return jsonify(dict_state)
     states = storage.all(State)
-    states_all = []
-    for x in states.values():
-        states_all.append(x.to_dict())
+    states_all = [x.to_dict() for x in states.values()]
     return jsonify(states_all)
 
 

@@ -36,9 +36,7 @@ def get_places(city_id, place_id):
         all_places = my_city.places
     except Exception:
         abort(404)
-    places = []
-    for c in all_places:
-        places.append(c.to_dict())
+    places = [c.to_dict() for c in all_places]
     return jsonify(places)
 
 
@@ -102,7 +100,6 @@ def search(request):
     if body_request is None:
         abort(400, 'Not a JSON')
     places_list = []
-    places_amenity_list = []
     place_amenities = []
     all_cities = []
     states = body_request.get('states')
@@ -110,21 +107,18 @@ def search(request):
     amenities = body_request.get('amenities')
     if len(body_request) == 0 or (states is None and cities is None):
         places = storage.all(Place)
-        for p in places.values():
-            places_list.append(p.to_dict())
+        places_list.extend(p.to_dict() for p in places.values())
     if states is not None and len(states) is not 0:
         for id in states:
             get_cities = get_all(id, None).json
-            for city in get_cities:
-                all_cities.append(city.get('id'))
-        for id in all_cities:
-            for p in places.json:
-                places_list.append(p)
+            all_cities.extend(city.get('id') for city in get_cities)
+        for _ in all_cities:
+            places_list.extend(iter(places.json))
     if cities is not None and len(cities) is not 0:
-        for id in cities:
-            for p in places.json:
-                places_list.append(p)
+        for _ in cities:
+            places_list.extend(iter(places.json))
     if amenities is not None and len(amenities) is not 0:
+        places_amenity_list = []
         for p in places_list:
             place_id = p.get('id')
             get_amenities = storage.get(Place, place_id)
